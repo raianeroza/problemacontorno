@@ -46,7 +46,7 @@ double g(double z, double y, double t)
 double grunge(double ti, double yi, double h, double zi)
 {
 
-	double yn, k1=0., k2=0., k3=0., k4=0., yrk, tn, t1, , l1=0., l2=0., l3=0., l4=0.;
+	double yn, k1=0., k2=0., k3=0., k4=0., yrk, tn, t1, l1=0., l2=0., l3=0., l4=0., zn;
 	
 	yn=yi;
 	tn=ti;
@@ -56,9 +56,19 @@ double grunge(double ti, double yi, double h, double zi)
 		
 		fprintf(op,"%.2lf\t%.2lf\n", tn, yn);
 		
+		k1 = zn;
+		l1 = g(k1,yn,tn);
 		
+		k2 = zn + (h/2.)*k1;
+		l2 = g(k2,yn,tn);
+		
+		k3 = zn + (h/2)*k2;
+		l3 = g(k3,yn,tn);
+		
+		k4 = yn + (h*k3);
+		l4 = g(k4,yn,tn);
 	
-		yrk = yn + (h/6.)*(k1 + (2.*k2) + (2.*k3) + k4);
+		yrk = yn + (h/6.)*(l1 + (2.*l2) + (2.*l3) + l4);
 		
 		t1=tn+h;
 		
@@ -70,14 +80,15 @@ double grunge(double ti, double yi, double h, double zi)
 
 main(int argc, char **argv)
 {
-	double t0=0., y0=2., z0=2., h2;
+	double t0=0., y0=2., z0=2., h1;
 	
-	h2 =(1. - 0.)/N;
+	
+	h1 =(1. - 0.)/N;
 	
 	op=fopen(argv[1], "w");
 	
-	frunge(t0,y0,h);
-	
+	//frunge(t0,y0,h);
+	grunge(t0,y0,h1,z0);
 	
 	fclose(op);
 }
