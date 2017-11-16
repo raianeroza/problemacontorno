@@ -56,16 +56,16 @@ double grunge(double ti, double yi, double h, double zi)
 		
 		fprintf(op,"%.2lf\t%.2lf\n", tn, yn);
 		
-		k1 = zn;
+		k1 = zn +yn;
 		l1 = g(k1,yn,tn);
 		
-		k2 = zn + (h/2.)*k1;
+		k2 = zn + yn + (h/2.)*k1;
 		l2 = g(k2,yn,tn);
 		
-		k3 = zn + (h/2)*k2;
+		k3 = zn + yn + (h/2)*k2;
 		l3 = g(k3,yn,tn);
 		
-		k4 = yn + (h*k3);
+		k4 = zn + yn + (h*k3);
 		l4 = g(k4,yn,tn);
 	
 		yrk = yn + (h/6.)*(l1 + (2.*l2) + (2.*l3) + l4);
