@@ -6,55 +6,71 @@
 
 #define N 10
 #define L 2
-#define M 2
-#define n 4
+#define M 3
+#define n 2
 
 FILE *op;
 
 typedef double (*sistfunc)();
 
-double f(double y[M])
+double f(double y[], double t)
 {
 	return y[1];
 }
-double g(double y[0], double y[m], double t)
+double g(double y[], double t)
 {
 	return (3.*y[1]) - (2.*y[0]) + 6.*exp(-t);
 }
 
-double grunge(sistfunc func[], double y[M], double t,double h)
+double grunge(sistfunc func[], double y[], double t,double h)
 {
 
-	double k1[n], k2[n], k3[n], k4[n], yrk[n], tn, t1, l1[n], l2[n], l3[n], l4[n], zn;
+	double k1[n], k2[n], k3[n], k4[n], yrk[n], tn, yt[n];
 	int i;
 		
-	for(i=0; i<n;i++)	k1[i] = f(y[1]);
-	for(i=0; i<n;i++)	l1[i] = g(k1[i],y[i],tn);
+	for(i=0; i<n;i++)	k1[i] = func[i](y, t);
+	
+	for(i=0; i<n;i++)	yt[i] = y[i] + (h/2.)*k1[i];
 		
-	for(i=0; i<n;i++)	k2[i] = y[1] + y[i] + (h/2.)*k1[i];
-	for(i=0; i<n;i++)	l2[i] = g(k2[i],y[i],tn);
+	for(i=0; i<n;i++)	k2[i] = func[i](yt, t + (h/2.)) ;
+	
+	for(i=0; i<n;i++)	yt[i] = y[i] + (h/2.)*k2[i];
 		
-	for(i=0; i<n;i++)	k3[i] = y[1] + y[i] + (h/2)*k2[i];
-	for(i=0; i<n;i++)	l3[i] = g(k3[i],y[i],tn);
+	for(i=0; i<n;i++)	k3[i] = func[i](yt, t + (h/2.));
+	
+	for(i=0; i<n;i++)	yt[i] = y[i] + h*k3[i];
 		
-	for(i=0; i<n;i++)	k4[i] = y[0] + y[i] + (h*k3[i]);
-	for(i=0; i<n;i++)	l4[i] = g(k4[i],y[i],tn);
+	for(i=0; i<n;i++)	k4[i] = func[i](yt, t+h);
+	
 
-	for(i=0; i<n;i++)	yrk[i] = y[i] + (h/6.)*(l1[i] + (2.*l2[i]) + (2.*l3[i]) + l4[i]);
-
+	for(i=0; i<n;i++)	y[i] = y[i] + (h/6.)*(k1[i] + (2.*k2[i]) + (2.*k3[i]) + k4[i]);
+	
+	return y[0];
 }
 
 main(int argc, char **argv)
 {
-	double t0=0., y0=2., z0=2., h1=(1. - 0.)/N;
+	double t0=0., y0=2., z0=2., h=(1. - 0.)/N, tn, yt[n], y;
+	sistfunc equacoes[n]={f,g};
 	
-	op=fopen(argv[1], "w");
+	//op=fopen(argv[1], "w");
 	
-	while(tn<=1.){
+	tn=t0;
+	yt[0]=y0;
+	yt[1]=z0;
 	
-		sistfunc equacoes[n]={f,g};
-		grunge(sistfunc func[],y[M],t0,h1);
+	y=y0;
+	
+	while(tn<1.){
+		
+		printf("%.2lf\t%.2lf\n", tn, y);
+		
+		y = grunge(equacoes,yt,tn,h);
+		
+		tn=tn+h;
+		
+		
 	}
 	
-	fclose(op);
+	//fclose(op);
 }
