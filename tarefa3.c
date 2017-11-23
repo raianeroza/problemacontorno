@@ -9,6 +9,10 @@ FILE *op;
 
 typedef double (*sistfunc)();
 
+double f(double y[], double t)
+{
+	return y[1];
+}
 double f2(double y[], double t)
 {
 	return y[1] + 2*y[0];
@@ -46,25 +50,39 @@ double grunge(sistfunc func[], double y[], double t, double h)
 
 main(int argc, char **argv)
 {
-	double t0=0., y0=0.3, y1=0,  h=((M_PI/2.) - 0.)/N, tn, yt[n], y;
+	double t0=0., y1[n]={-0.3,0.}, y2[n]={0.,1.},  h=((M_PI/2.) - 0.)/N, tn, yt1[N+1], yt2[N+1], yn[N+1];
+	int i=0;
 	
-	sistfunc equacoes[n]={f2,f1};
+	sistfunc equacoes[n]={f,f1}, equacoes2[n]={f,f2};
+	
+	
 	op=fopen(argv[1], "w");
 	
 	tn=t0;
-	yt[0]=y0;
-	yt[1]=y1;
+	yt1[0]=y1[0];
+	yt2[0]=y2[0];
 	
-	y=y0;
-	
+	i=1;
 	while(tn<(M_PI/2)){
 		
-		fprintf(op,"%.2lf\t%.2lf\n", tn, y);
+		yt1[i] = grunge(equacoes,y1,tn,h);
+		yt2[i] = grunge(equacoes2,y2,tn,h);
+		//printf("%lf\t%lf\t%lf\n", tn, yt1[i], yt2[i]);
 		
-		y = grunge(equacoes,yt,tn,h);
-		
-		tn=tn+h;	
+		tn+=h;	
+		i++;
+
 	}
 	
+	tn=t0;
+	
+	for(i=0; i<N; i++)
+	{
+		yn[i] = yt1[i] + ( (-0.1-yt1[N]) / yt2[N] )*yt2[i];
+		fprintf(op,"%lf\t%lf\t%lf\t%lf\n", tn, yt1[i], yt2[i], yn[i]);
+		
+		tn+=h;
+		
+	}
 	fclose(op);
 }
